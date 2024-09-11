@@ -12,15 +12,15 @@ pipeline {
                 }
             }
         }
-        // stage("Verify SSH connection to server") {
-        //     steps {
-        //         sshagent(credentials: ['aws-ec2']) {
-        //             sh '''
-        //                 ssh -o StrictHostKeyChecking=no ec2-user@13.40.116.143 whoami
-        //             '''
-        //         }
-        //     }
-        // }
+        stage("Verify SSH connection to server") {
+            steps {
+                sshagent(credentials: ['aws-ec2-workshop']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ec2-user@3.87.8.100 whoami
+                    '''
+                }
+            }
+        }
         stage("Clear all running docker containers") {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -76,6 +76,24 @@ pipeline {
     }
 
     post {
+        success {
+            sh ' cd "/var/lib/jenkins/workspace/Workshop"'
+            sh 'rm -rf artifact.zip'
+            sh 'zip -r artifact.zip . -x "*node_modules**"'
+            withCredentials([sshUserPrivateKey(credentialsId: "aws-ec2-workshop", keyFileVariable: 'keyfile')]) {
+                sh 'scp -v -o StrictHostKeyChecking=no -i ${keyfile} /var/lib/jenkins/workspace/Workshop/artifact.zip ec2-user@3.87.8.100:/home/ec2-user/artifact'
+            }
+            sshagent(credentials: ['aws-ec2-workshop']) {
+                sh 'ssh -o StrictHostKeyChecking=no ec2-user@3.87.8.100 unzip -o /home/ec2-user/artifact/artifact.zip -d /var/www/html'
+                script {
+                    try {
+                        sh 'ssh -o StrictHostKeyChecking=no ec2-user@3.87.8.100 sudo chmod 777 /var/www/html/storage -R'
+                    } catch (Exception e) {
+                        echo 'Some file permissions could not be updated.'
+                    }
+                }
+            }
+        }
         always {
             echo 'Cleaning up...'
             sh 'docker ps'
