@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\Interfaces\IPostRepository;
+use App\Services\IWebhookService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
     private IPostRepository $postRepository;
+    private IWebhookService $webhookService;
 
-    public function __construct(IPostRepository $postRepository)
+    public function __construct(
+        IPostRepository $postRepository,
+        IWebhookService $webhookService
+    )
     {
         $this->postRepository = $postRepository;
+        $this->webhookService = $webhookService;
     }
 
     /**
@@ -40,16 +47,45 @@ class PostController extends Controller
 
     /**
      * Filter posts
+     * @param Request $request
      * @return JsonResponse
      * */
-    public function filter(): JsonResponse
+    public function filter(Request $request): JsonResponse
     {
-        $posts = $this->postRepository->filter();
+        $input = $request->all();
+
+        $posts = $this->postRepository->filter($input);
 
         return response()->json([
             'explain' => $this->explain($posts),
             'data' => $posts->get(),
         ]);
+    }
+
+    /**
+     * Fetch products
+     * @return JsonResponse
+     * */
+    public function fetchProducts(): JsonResponse
+    {
+        $products = $this->webhookService->getProducts();
+
+        return response()->json($products);
+    }
+
+    /**
+     * Store a product
+     * @return JsonResponse
+     * */
+    public function storeProduct(): JsonResponse
+    {
+        $product = $this->webhookService->createProduct([
+            'title' => 'Product 1',
+            'price' => 100,
+            'inventory' => 10,
+        ]);
+
+        return response()->json($product);
     }
 
     /**

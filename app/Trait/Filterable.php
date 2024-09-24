@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Trait;
 
+use App\Filters\QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 
 trait Filterable
 {
-    public function scopeFilterable(Builder $builder, array $filterFields = ['*'], array $sortFields = [])
+    public function scopeFilterable(Builder $builder, QueryBuilder $queryBuilder): array
     {
-        return ;
+        return $queryBuilder->apply($builder);
     }
 }

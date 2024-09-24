@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'webhook' => [
+        'host' => env('WEBHOOK_HOST', 'example.com'),
+        'version' => env('WEBHOOK_VERSION', '2021-07'),
+        'path' => env('WEBHOOK_PATH', 'products.json'),
+    ],
 ];

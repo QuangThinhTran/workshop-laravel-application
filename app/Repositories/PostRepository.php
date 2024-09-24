@@ -31,8 +31,8 @@ class PostRepository implements IPostRepository
         return $query;
     }
 
-    public function filter()
+    public function filter($data)
     {
-
+        return Post::filterable($data);
     }
 }

@@ -1,30 +1,28 @@
 <?php
 
-namespace App\Filter;
+namespace App\Filters;
 
-use App\Filter\QueryBuilder;
+use App\Filters\QueryBuilder;
 
 class PostFilter extends QueryBuilder
 {
-    public string $sortBy = 'id';
-
-    public array $fillable = [
+    protected ?array $filterable = [
         'title',
         'content',
         'author',
     ];
 
-    public function filterTitle($title)
+    public function filterTitle(?string $title)
     {
         return $this->builder->where('title', 'like', "%$title%");
     }
 
-    public function filterContent($content)
+    public function filterContent(?string $content)
     {
         return $this->builder->where('content', 'like', "%$content%");
     }
 
-    public function filterAuthor($author)
+    public function filterAuthor(?string $author)
     {
         return $this->builder->where('author', $author);
     }
