@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Filters\PostFilter;
+use App\Filters\QueryBuilder;
 use App\Models\Post;
 use App\Repositories\Interfaces\IPostRepository;
 
@@ -31,8 +33,14 @@ class PostRepository implements IPostRepository
         return $query;
     }
 
+    /**
+     * Filter posts
+     * @param $data
+     * @return mixed
+     * */
     public function filter($data)
     {
-        return Post::filterable($data);
+        $filters = new PostFilter($data);
+        return Post::filterable($filters);
     }
 }

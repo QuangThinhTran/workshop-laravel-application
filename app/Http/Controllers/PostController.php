@@ -55,10 +55,10 @@ class PostController extends Controller
         $input = $request->all();
 
         $posts = $this->postRepository->filter($input);
+        $posts = $this->postRepository->filter($request);
 
         return response()->json([
-            'explain' => $this->explain($posts),
-            'data' => $posts->get(),
+            'data' => $posts,
         ]);
     }
 

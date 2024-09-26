@@ -54,26 +54,46 @@ class QueryBuilder
         $this->filters = $this->request->all();
     }
 
+    /**
+     * Get the current page number for pagination.
+     * @return int
+     * */
     protected function getPage(): int
     {
         return $this->filters['page'] ?? $this->currentPage;
     }
 
+    /**
+     * Get the current page size for pagination.
+     * @return int
+     * */
     protected function getPageSize(): int
     {
         return $this->filters['page_size'] ?? $this->currentPageSize;
     }
 
+    /**
+     * Get the current sorting column.
+     * @return string
+     * */
     protected function getSort(): string
     {
         return $this->filters['sort'] ?? $this->currentSort;
     }
 
+    /**
+     * Get the current sorting type ('asc' or 'desc').
+     * @return string
+     * */
     protected function getSortType(): string
     {
         return $this->filters['sort_type'] ?? $this->currentSortType;
     }
 
+    /**
+     * Get the total number of records.
+     * @return int
+     * */
     protected function getTotal(): int
     {
         return count($this->builder->get());
@@ -100,11 +120,16 @@ class QueryBuilder
         ];
     }
 
-    private function applyFilters()
+    /**
+     * Apply filters to the query builder.
+     * @return void
+     */
+    private function applyFilters(): void
     {
         foreach ($this->filters as $key => $value) {
             $method = 'filter' . Str::studly($key);
-            if ($value !== '' && method_exists($this, $method)) {
+
+            if (method_exists($this, $method)) {
                 $this->{$method}($value);
             }
         }
